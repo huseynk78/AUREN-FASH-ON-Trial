@@ -30,9 +30,13 @@ function createMailService(db, { env = process.env, transport, clock = Date.now 
   const configured = enabled && validEmail(user) && Boolean(pass);
   const sender = { name: env.MAIL_FROM_NAME || 'AUREN FASHION', address: user };
   const smtp = configured ? (transport || nodemailer.createTransport({
-    host: 'smtp.gmail.com', port: 465, secure: true,
-    family: 4,
-    auth: { user, pass }, connectionTimeout: 15000, greetingTimeout: 15000,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    auth: { user, pass },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
     socketTimeout: 30000,
   })) : null;
   let running = false;
