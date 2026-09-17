@@ -7,3 +7,4 @@
 **Order of work:** agree schema and status rules first; then Person 1 opens a PR for database/admin foundations while Person 2 opens a separate PR for customer UI; each reviews the other’s PR with concrete comments; integrate, test on a phone, deploy to persistent storage, and run the handover checklist together.
 
 **Git rule:** each person works on a branch, makes small descriptive commits from their own machine, opens a pull request, and waits for the other person’s written review before merge. Keep the review comments—even on good PRs—because the trial explicitly evaluates them.
+**Review checklist:** before merge, the reviewer checks the changed files, confirms the related requirement, and verifies that `npm test` passes.
