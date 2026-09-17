@@ -54,8 +54,8 @@ function createMailService(db, { env = process.env, transport, clock = Date.now 
     db.prepare(`INSERT OR IGNORE INTO email_outbox
       (event_key,order_id,recipient,subject,body,state,last_error,created_at)
       VALUES(?,?,?,?,?,?,?,?)`).run(eventKey, orderId, recipient, subject, body,
-        validEmail(recipient) ? 'pending' : 'skipped',
-        validEmail(recipient) ? '' : 'missing_email', new Date(clock()).toISOString());
+      validEmail(recipient) ? 'pending' : 'skipped',
+      validEmail(recipient) ? '' : 'missing_email', new Date(clock()).toISOString());
   }
 
   async function drain() {
@@ -66,7 +66,8 @@ function createMailService(db, { env = process.env, transport, clock = Date.now 
       for (const job of jobs) {
         db.prepare("UPDATE email_outbox SET state='sending', attempts=attempts+1 WHERE id=?").run(job.id);
         try {
-          const result = await smtp.sendMail({ from: sender, to: job.recipient, replyTo: user,
+          const result = await smtp.sendMail({
+            from: sender, to: job.recipient, replyTo: user,
             subject: job.subject, text: job.body,
             messageId: `<auren-${job.event_key.replace(/[^a-z0-9-]/gi, '-')}-${job.id}@${user.split('@')[1]}>`,
           });
@@ -75,8 +76,9 @@ function createMailService(db, { env = process.env, transport, clock = Date.now 
           db.prepare("UPDATE email_outbox SET state='submitted', submitted_at=?, last_error='' WHERE id=?")
             .run(new Date(clock()).toISOString(), job.id);
         } catch (error) {
+          console.error('EMAIL SEND ERROR:', error.code, error.message);
           const attempts = job.attempts + 1;
-          const code = ['EAUTH','ECONNECTION','ETIMEDOUT','ESOCKET','EENVELOPE','EMESSAGE'].includes(error.code) ? error.code : 'SEND_FAILED';
+          const code = ['EAUTH', 'ECONNECTION', 'ETIMEDOUT', 'ESOCKET', 'EENVELOPE', 'EMESSAGE'].includes(error.code) ? error.code : 'SEND_FAILED';
           db.prepare("UPDATE email_outbox SET state=?, next_attempt_at=?, last_error=? WHERE id=?")
             .run(attempts >= 5 ? 'failed' : 'pending', clock() + Math.min(3600000, 60000 * 2 ** (attempts - 1)), code, job.id);
         }
@@ -92,7 +94,8 @@ function createMailService(db, { env = process.env, transport, clock = Date.now 
   function retryFailed() {
     return db.prepare("UPDATE email_outbox SET state='pending',attempts=0,next_attempt_at=0,last_error='' WHERE state='failed'").run().changes;
   }
-  return { enqueue, drain, start, stop, retryFailed,
+  return {
+    enqueue, drain, start, stop, retryFailed,
     status: () => ({ enabled, configured, sender: user }),
     recent: () => db.prepare('SELECT id,order_id,recipient,state,attempts,last_error,created_at FROM email_outbox ORDER BY id DESC LIMIT 20').all(),
   };
