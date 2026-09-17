@@ -1,0 +1,20 @@
+{
+  "name": "instagram-order-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile-first guest ordering and admin order management for a small Instagram shop.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.cjs"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "nodemailer": "^10.0.10"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}
