@@ -1,6 +1,6 @@
 # Day-1 plan to send
 
-**Person 1 — data and admin:** inspect the starter repository; own database schema, migrations/seeding, admin authentication, orders list/search/filter/status changes, Excel export, and deployment configuration.
+**Person 1 — data and admin:** own database schema, migrations/seeding, admin authentication, orders list/search/filter/status changes, Excel export, and deployment configuration. Verify admin changes with the existing automated test suite before review.
 
 **Person 2 — customer flow and quality:** own mobile order form, product/quantity UI, AZN/USD display, client validation, responsive styling, notification-event presentation, manual testing, README, and handover note.
 
